@@ -58,8 +58,10 @@ def const_support_url():
 def const_download_url():
     """Base download URL."""
     return ('https://clients2.google.com/service/update2/' +
-            'crx?response=redirect&nacl_arch=x86-64&' +
-            'prodversion=9999.0.9999.0&x=id%3D{}%26uc')
+            'crx?response=redirect&os=linux&arch=x64&os_arch=x86_64&' +
+            'nacl_arch=x86-64&prod=chromecrx&prodchannel=stable&' +
+            'prodversion=9999.0.9999.0&lang=en-US&acceptformat=crx2,crx3&' +
+            'x=id%3D{}%26installsource%3Dondemand%26uc')
 
 
 def const_categories():

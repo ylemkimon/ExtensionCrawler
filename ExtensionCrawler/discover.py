@@ -36,7 +36,7 @@ def is_generic_url(url):
     """of the ids that get returned by the plain urls, therefore we"""
     """skip urls with a language parameter."""
 
-    return re.match(r"^{}\?shard=\d+&numshards=\d+$".format(
+    return re.match(r"^{}\?shard=\d+$".format(
         config.const_sitemap_url()), url)
 
 
