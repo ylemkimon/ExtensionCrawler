@@ -104,8 +104,8 @@ class UpdateResult:
 
     def is_ok(self):
         return ((self.worker_exception is None)
-                and self.res_overview.is_ok()
-                and (self.res_crx.is_ok() or self.res_crx.not_modified())
+                and self.res_overview is not None and self.res_overview.is_ok()
+                and self.res_crx is not None and (self.res_crx.is_ok() or self.res_crx.not_modified())
                 and ((self.res_reviews is None) or self.res_reviews.is_ok())
                 and ((self.res_support is None) or self.res_support.is_ok()))
 
