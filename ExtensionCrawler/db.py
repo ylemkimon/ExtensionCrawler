@@ -249,6 +249,42 @@ def parse_and_insert_crx(ext_id, datepath, con):
                                 url_md5=hashlib.md5(
                                     str(urlpattern).encode()).digest(),
                                 url=str(urlpattern))
+            if "externally_connectable" in manifest:
+                if "ids" in manifest["externally_connectable"]:
+                    for extid in manifest["externally_connectable"]["ids"]:
+                        con.insert(
+                            "externally_connectable_url",
+                            crx_etag=etag,
+                            url_md5=hashlib.md5(
+                                str(extid).encode()).digest(),
+                            url=str(extid))
+                if "matches" in manifest["externally_connectable"]:
+                    for urlpattern in manifest["externally_connectable"]["matches"]:
+                        con.insert(
+                            "externally_connectable_url",
+                            crx_etag=etag,
+                            url_md5=hashlib.md5(
+                                str(urlpattern).encode()).digest(),
+                            url=str(urlpattern))
+            else:
+                path_list = list(
+                    filter(lambda x: os.path.basename(x.filename) != "" and os.path.splitext(os.path.basename(x.filename))[1] == ".js",
+                        f.infolist()))
+                for js in path_list:
+                    with f.open(js) as js_file:
+                        raw_data = js_file.read()
+                        try:
+                            data = raw_data.decode("utf-8-sig")
+                        except UnicodeDecodeError:
+                            data = raw_data.decode("latin1")
+                        if "onMessageExternal" in data or "onConnectExternal" in data:
+                            con.insert(
+                                "externally_connectable_url",
+                                crx_etag=etag,
+                                url_md5=hashlib.md5(
+                                    "*".encode()).digest(),
+                                url="*")
+                            break
 
         # js_files = decompose_js_with_connection(f, con)
         # for file_info in js_files:
