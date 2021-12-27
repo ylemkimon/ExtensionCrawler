@@ -17,7 +17,6 @@
 
 from ExtensionCrawler.config import const_mysql_config_file
 from ExtensionCrawler.crx import read_crx
-from ExtensionCrawler.js_decomposer import decompose_js_with_connection
 from ExtensionCrawler.util import log_warning, log_debug, log_exception, log_info
 
 from ExtensionCrawler.dbbackend.mysql_backend import MysqlBackend, convert_date
@@ -251,45 +250,45 @@ def parse_and_insert_crx(ext_id, datepath, con):
                                     str(urlpattern).encode()).digest(),
                                 url=str(urlpattern))
 
-        js_files = decompose_js_with_connection(f, con)
-        for file_info in js_files:
-            for prefix, typ in [("", "AS_IS"), ("normalized_", "NORMALIZED"),
-                                ("dec_",
-                                 "DECOMPRESSED"), ("dec_normalized_",
-                                                   "DECOMPRESSED_NORMALIZED")]:
-                if file_info[prefix + "md5"] is not None:
-                    con.insert(
-                        "crxfile",
-                        crx_etag=etag,
-                        path=file_info['path'],
-                        filename=file_info['filename'],
-                        mimetype=file_info["mimetype"][0],
-                        mimetype_detail=file_info["mimetype"][1],
-                        simhash=file_info["simhash"],
-                        md5=file_info[prefix + "md5"],
-                        sha1=file_info[prefix + "sha1"],
-                        sha256=file_info[prefix + "sha256"],
-                        typ=typ)
-                    con.insert(
-                        "libdet",
-                        md5=file_info[prefix + "md5"],
-                        sha1=file_info[prefix + "sha1"],
-                        sha256=file_info[prefix + "sha256"],
-                        size=file_info[prefix + "size"],
-                        loc=file_info[prefix + "loc"],
-                        description=file_info[prefix + "description"],
-                        encoding=file_info[prefix + "encoding"],
-                        mimetype_magic=file_info[prefix + "mimetype_magic"],
-                        library=file_info["lib"],
-                        version=file_info["version"],
-                        typ=typ,
-                        classification_type=file_info['type'].value,
-                        detect_method=file_info['detectionMethod'].value,
-                        detect_method_details=file_info[
-                            'detectionMethodDetails'],
-                        evidence_start_pos=file_info['evidenceStartPos'],
-                        evidence_end_pos=file_info['evidenceEndPos'],
-                        evidence_text=file_info['evidenceText'])
+        # js_files = decompose_js_with_connection(f, con)
+        # for file_info in js_files:
+        #     for prefix, typ in [("", "AS_IS"), ("normalized_", "NORMALIZED"),
+        #                         ("dec_",
+        #                          "DECOMPRESSED"), ("dec_normalized_",
+        #                                            "DECOMPRESSED_NORMALIZED")]:
+        #         if file_info[prefix + "md5"] is not None:
+        #             con.insert(
+        #                 "crxfile",
+        #                 crx_etag=etag,
+        #                 path=file_info['path'],
+        #                 filename=file_info['filename'],
+        #                 mimetype=file_info["mimetype"][0],
+        #                 mimetype_detail=file_info["mimetype"][1],
+        #                 simhash=file_info["simhash"],
+        #                 md5=file_info[prefix + "md5"],
+        #                 sha1=file_info[prefix + "sha1"],
+        #                 sha256=file_info[prefix + "sha256"],
+        #                 typ=typ)
+        #             con.insert(
+        #                 "libdet",
+        #                 md5=file_info[prefix + "md5"],
+        #                 sha1=file_info[prefix + "sha1"],
+        #                 sha256=file_info[prefix + "sha256"],
+        #                 size=file_info[prefix + "size"],
+        #                 loc=file_info[prefix + "loc"],
+        #                 description=file_info[prefix + "description"],
+        #                 encoding=file_info[prefix + "encoding"],
+        #                 mimetype_magic=file_info[prefix + "mimetype_magic"],
+        #                 library=file_info["lib"],
+        #                 version=file_info["version"],
+        #                 typ=typ,
+        #                 classification_type=file_info['type'].value,
+        #                 detect_method=file_info['detectionMethod'].value,
+        #                 detect_method_details=file_info[
+        #                     'detectionMethodDetails'],
+        #                 evidence_start_pos=file_info['evidenceStartPos'],
+        #                 evidence_end_pos=file_info['evidenceEndPos'],
+        #                 evidence_text=file_info['evidenceText'])
 
 
 def get(d, k):
@@ -453,29 +452,29 @@ def update_db_incremental_with_connection(tmptardir, ext_id, date, con):
     except Exception:
         log_exception("Exception when parsing status", 3)
 
-    reviewpaths = glob.glob(os.path.join(datepath, "reviews*-*.text"))
-    for reviewpath in reviewpaths:
-        try:
-            parse_and_insert_review(ext_id, date, reviewpath, con)
-        except json.decoder.JSONDecodeError:
-            log_warning("- WARNING: Review is not a proper json file!", 3)
-        except Exception:
-            log_exception("Exception when parsing review", 3)
+    # reviewpaths = glob.glob(os.path.join(datepath, "reviews*-*.text"))
+    # for reviewpath in reviewpaths:
+    #     try:
+    #         parse_and_insert_review(ext_id, date, reviewpath, con)
+    #     except json.decoder.JSONDecodeError:
+    #         log_warning("- WARNING: Review is not a proper json file!", 3)
+    #     except Exception:
+    #         log_exception("Exception when parsing review", 3)
 
-    supportpaths = glob.glob(os.path.join(datepath, "support*-*.text"))
-    for supportpath in supportpaths:
-        try:
-            parse_and_insert_support(ext_id, date, supportpath, con)
-        except json.decoder.JSONDecodeError:
-            log_warning("- WARNING: Support is not a proper json file!", 3)
-        except Exception:
-            log_exception("Exception when parsing support", 3)
+    # supportpaths = glob.glob(os.path.join(datepath, "support*-*.text"))
+    # for supportpath in supportpaths:
+    #     try:
+    #         parse_and_insert_support(ext_id, date, supportpath, con)
+    #     except json.decoder.JSONDecodeError:
+    #         log_warning("- WARNING: Support is not a proper json file!", 3)
+    #     except Exception:
+    #         log_exception("Exception when parsing support", 3)
 
-    repliespaths = glob.glob(os.path.join(datepath, "*replies.text"))
-    for repliespath in repliespaths:
-        try:
-            parse_and_insert_replies(ext_id, date, repliespath, con)
-        except json.decoder.JSONDecodeError:
-            log_warning("- WARNING: Reply is not a proper json file!", 3)
-        except Exception:
-            log_exception("Exception when parsing reply", 3)
+    # repliespaths = glob.glob(os.path.join(datepath, "*replies.text"))
+    # for repliespath in repliespaths:
+    #     try:
+    #         parse_and_insert_replies(ext_id, date, repliespath, con)
+    #     except json.decoder.JSONDecodeError:
+    #         log_warning("- WARNING: Reply is not a proper json file!", 3)
+    #     except Exception:
+    #         log_exception("Exception when parsing reply", 3)
